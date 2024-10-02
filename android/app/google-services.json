@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "128597977439",
+    "firebase_url": "https://greenroute-7251d-default-rtdb.firebaseio.com/",
+    "project_id": "greenroute-7251d",
+    "storage_bucket": "greenroute-7251d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128597977439:android:c2bd6dfe2edc09bc826eea",
+        "android_client_info": {
+          "package_name": "com.example.greenroute"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcFtTZss1L2zvfs6HFKi9a9W4RPed2P1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
