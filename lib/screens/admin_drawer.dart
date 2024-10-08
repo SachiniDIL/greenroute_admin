@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:greenroute_admin/screens/admin_home.dart';
 import 'residents_page.dart';
 import 'truck_drivers_page.dart';
 import 'trucks_page.dart';
@@ -42,6 +43,17 @@ class AdminDrawer extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text('Dashboard'),
+            onTap: () {
+              Navigator.pop(context); // Close drawer
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminHomePage()),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.people),
