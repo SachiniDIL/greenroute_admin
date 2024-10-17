@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'admin_drawer.dart'; // Import the AdminDrawer
+// Import the AdminDrawer
 
 class PublicCollectingPlacesPage extends StatelessWidget {
   const PublicCollectingPlacesPage({super.key});

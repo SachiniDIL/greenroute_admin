@@ -10,10 +10,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "GREENROUTE",
-      home: SplashScreen(), // Set the initial screen to SplashScreen
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: "GREENROUTE",
+        theme: ThemeData(
+          primarySwatch: Colors.green,
+        ),
+        home: const SplashScreen(),
     );
   }
 }
@@ -29,11 +32,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Navigate to AdminLoginScreen after 1.5 seconds
-    Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+    // Simulate a short delay for the splash screen
+    Future.delayed(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const AdminLoginScreen()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     });
   }
@@ -43,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Center(
         child: Image.asset(
-          'assets/garbage_truck.png', // Ensure this image is in the 'assets' folder
+          'assets/garbage_truck.png', // Make sure you have this image in your assets folder
           height: 100,
         ),
       ),

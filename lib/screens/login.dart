@@ -1,78 +1,71 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'admin_home.dart'; // Import your AdminHomePage
+import 'package:greenroute_admin/providers/auth_provider.dart';
+import 'package:greenroute_admin/utils/snack_bar_util.dart';
+import '../utils/validators.dart';
+import 'business_signup.dart'; // Import your AdminHomePage
 
-class AdminLoginScreen extends StatefulWidget {
-  const AdminLoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  _AdminLoginScreenState createState() => _AdminLoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _AdminLoginScreenState extends State<AdminLoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoginPressed = false;
+  String? _usernameError;
+  String? _passwordError;
 
   Future<void> _login() async {
     setState(() {
       _isLoginPressed = true;
+      _usernameError = null;
+      _passwordError = null; // Reset errors before validation
     });
 
     String enteredUsername = _usernameController.text;
     String enteredPassword = _passwordController.text;
 
-    try {
-      // Replace this with your Firebase Realtime Database URL or the correct JSON API URL
-      final String firebaseUrl = 'https://greenroute-7251d-default-rtdb.firebaseio.com/admin.json';
+    // Validate inputs
+    _usernameError = Validators.validateEmail(enteredUsername);
+    _passwordError = Validators.validatePassword(enteredPassword);
 
-      final response = await http.get(Uri.parse(firebaseUrl));
-
-      if (response.statusCode == 200) {
-        // Decode the response body
-        Map<String, dynamic>? adminData = json.decode(response.body);
-
-        // Check if adminData is null or not
-        if (adminData != null) {
-          // Validate the entered credentials against the stored admin credentials
-          String storedUsername = adminData['username'];
-          String storedPassword = adminData['password'];
-
-          if (storedUsername == enteredUsername && storedPassword == enteredPassword) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Login Successful')),
-            );
-            // Navigate to AdminHomePage and replace the login screen
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const AdminHomePage()),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Invalid credentials')),
-            );
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No admin data found')),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to load admin data')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+    if (_usernameError != null || _passwordError != null) {
+      // Show error messages if validation fails
+      setState(() {
+        _isLoginPressed = false; // Reset login button state
+      });
+      return; // Exit the method if validation fails
     }
 
-    setState(() {
-      _isLoginPressed = false;
-    });
+    AuthProvider authProvider = AuthProvider();
+
+    // Attempt login
+    try {
+      await authProvider.login(context, enteredUsername, enteredPassword);
+    } catch (e) {
+      SnackbarUtils.showSnackbar(
+        context,
+        'Login failed: $e',
+        color: Colors.red,
+      );
+    } finally {
+      setState(() {
+        _isLoginPressed = false; // Reset the login button state
+      });
+    }
+  }
+
+  // Navigate to SignUpScreen
+  void _navigateToSignUp() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BusinessSignUpScreen(),
+      ),
+    );
   }
 
   @override
@@ -93,7 +86,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
-                    'Admin Login',
+                    'Login',
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -103,9 +96,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   const SizedBox(height: 20),
                   TextField(
                     controller: _usernameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Username',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: const OutlineInputBorder(),
+                      errorText: _usernameError, // Show email validation error
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -115,9 +109,13 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     decoration: InputDecoration(
                       labelText: 'Password',
                       border: const OutlineInputBorder(),
+                      errorText: _passwordError,
+                      // Show password validation error
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {
@@ -129,8 +127,16 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: _isLoginPressed ? null : _login,
-                    child: const Text('Login'),
+                    onPressed: _isLoginPressed ? null : () => _login(),
+                    // Disable button if logging in
+                    child: _isLoginPressed
+                        ? const CircularProgressIndicator()
+                        : const Text('Login'),
+                  ),
+                  const SizedBox(height: 10),
+                  TextButton(
+                    onPressed: _navigateToSignUp, // Navigate to Sign-Up
+                    child: const Text('Don\'t have an account? Sign Up'),
                   ),
                 ],
               ),

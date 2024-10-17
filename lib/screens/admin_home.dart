@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'admin_drawer.dart';
+import 'sidebar.dart';
 
 class AdminHomePage extends StatelessWidget {
   const AdminHomePage({super.key});
@@ -10,7 +10,7 @@ class AdminHomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
       ),
-      drawer: const AdminDrawer(), // Reuse the same drawer
+      drawer: const Sidebar(), // Reuse the same drawer
       body: const Center(
         child: Text(
           'Welcome to the Admin Dashboard',

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'admin_drawer.dart'; // Import the AdminDrawer
+import 'sidebar.dart'; // Import the AdminDrawer
 
 class FeedbackPage extends StatelessWidget {
   const FeedbackPage({super.key});
@@ -10,7 +10,7 @@ class FeedbackPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Feedback'),
       ),
-      drawer: const AdminDrawer(), // Add the drawer
+      drawer: const Sidebar(), // Add the drawer
       body: const Center(
         child: Text('Feedback Page'),
       ),
