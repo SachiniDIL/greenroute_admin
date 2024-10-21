@@ -27,14 +27,14 @@ class WasteManager extends Users {
   // Factory method to create a WasteManager instance from a JSON Map
   factory WasteManager.fromJson(Map<String, dynamic> json) {
     return WasteManager(
-      userId: json['userId'],
-      username: json['username'],
-      password: json['password'],
-      email: json['email'],
-      address: json['address'],
-      contactNumber: json['contactNumber'],
-      managerId: json['managerId'],
-      userRole: json['userRole'],
+      userId: json['userId'] ?? '', // Provide default empty string if null
+      username: json['username'] ?? '', // Provide default empty string if null
+      password: json['password'] ?? '', // Provide default empty string if null
+      email: json['email'] ?? '', // Provide default empty string if null
+      address: json['address'] ?? '', // Provide default empty string if null
+      contactNumber: json['contactNumber'] ?? '', // Provide default empty string if null
+      managerId: json['managerId'] ?? '', // Provide default empty string if null
+      userRole: json['role'] ?? 'waste_manager', // Provide default value if null
     );
   }
 }

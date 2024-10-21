@@ -6,7 +6,8 @@ import '../models/user.dart';
 
 class AuthService {
   final String baseUrl = 'https://greenroute-7251d-default-rtdb.firebaseio.com';
-  final ApiClient _apiClient = ApiClient();
+  final apiClient = ApiClient();
+
 
   get userId => null;
 
@@ -34,7 +35,7 @@ class AuthService {
 
 // Login
   Future<Users?> login(String email, String password) async {
-    final response = await _apiClient.get("users.json"); // Fetch users data
+    final response = await apiClient.get("users.json"); // Fetch users data
 
     if (response is Map<String, dynamic>) {
       // If the response is a map, it means you fetched the user data correctly

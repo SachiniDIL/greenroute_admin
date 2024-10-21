@@ -1,25 +1,21 @@
 // lib/services/waste_collector_service.dart
 import 'dart:convert';
+import 'package:greenroute_admin/api/api_client.dart';
+import 'package:greenroute_admin/models/user.dart';
+import 'package:greenroute_admin/services/user_service.dart';
 import 'package:http/http.dart' as http;
 import '../models/waste_collector.dart';
 
 class WasteCollectorService {
-  final String baseUrl = 'https://example.com/api'; // Replace with your API URL
-
+  final apiClient = ApiClient();
+  final UserService _userService = UserService();
+  
   // Add a new waste collector
-  Future<WasteCollector?> addWasteCollector(WasteCollector collector) async {
-    final url = Uri.parse('$baseUrl/collectors');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(collector.toJson()),
-    );
-
-    if (response.statusCode == 201) {
-      return WasteCollector.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to add waste collector');
-    }
+  Future<void> addWasteCollector(WasteCollector collector) async {
+    String userId = _userService.assignNextUserId() as String;
+    String userRole = "waste_collector";
+    
+    Users newCollector = Users(userId: userId, userRole: userRole, password: null, email: email)
   }
 
   // Get waste collector by ID

@@ -2,12 +2,12 @@
 import '../api/api_client.dart';
 
 class UserService {
-  final ApiClient _apiClient = ApiClient();
+  final apiClient = ApiClient();
 
   // Method to find the next userId and set it to the user object
   Future<String> assignNextUserId() async {
     // Fetch all users from the Firebase database
-    final usersData = await _apiClient.get('users.json');
+    final usersData = await apiClient.get('users.json');
 
     if (usersData != null) {
       // Extract the list of user IDs and find the highest one
@@ -33,7 +33,7 @@ class UserService {
   // Method to find the user's key using the userId
   Future<String?> getUserKeyByUserId(String userId) async {
     try {
-      final response = await _apiClient.get('users.json?orderBy="userId"&equalTo="$userId"');
+      final response = await apiClient.get('users.json?orderBy="userId"&equalTo="$userId"');
       if (response != null && response is Map<String, dynamic>) {
         // Return the first key that matches the userId
         return response.keys.first;

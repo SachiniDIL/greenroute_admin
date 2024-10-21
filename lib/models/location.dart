@@ -9,16 +9,14 @@ class Locations {
     required this.name,
   });
 
-  // Convert JSON data to a Location object
   factory Locations.fromJson(Map<String, dynamic> json) {
     return Locations(
-      latitude: json['latitude'],
-      longitude: json['longitude'],
-      name: json['name'],
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0, // Ensure latitude is a double
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0, // Ensure longitude is a double
+      name: json['name'] ?? 'Unknown', // Provide default name if null
     );
   }
 
-  // Convert a Location object to JSON format
   Map<String, dynamic> toJson() {
     return {
       'latitude': latitude,
@@ -26,6 +24,4 @@ class Locations {
       'name': name,
     };
   }
-
-  fromJson(location) {}
 }

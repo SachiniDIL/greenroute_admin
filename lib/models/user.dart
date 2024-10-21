@@ -2,7 +2,7 @@ class Users {
   String userId;
   String userRole;
   String? username;
-  String password;
+  String? password;
   String email;
   String? address;
   String? contactNumber;
@@ -21,7 +21,7 @@ class Users {
     return Users(
       userId: json['userId'] ?? '', // Assuming userId is part of the JSON
       userRole: json['role'] ?? '',
-      username: json['username'], // Optional
+      username: json['username'] ?? '', // Optional
       password: json['password'] ?? '', // Usually, password should not be retrieved
       email: json['email'] ?? '',
       address: json['address'],
@@ -32,7 +32,7 @@ class Users {
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
-      'userRole': userRole,
+      'role': userRole,
       'username': username,
       'password': password,
       'email': email,

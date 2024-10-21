@@ -5,7 +5,7 @@ class Business extends Users {
   String businessName;
   String phoneNumber;
   String businessType;
-  TrashBin? trashBin;
+  TrashBin? trashBin; // Make it nullable
 
   Business({
     required this.businessName,
@@ -15,11 +15,10 @@ class Business extends Users {
     required super.userRole,
     required super.password,
     required super.email,
-    required trashBin,
-    super.address
+    this.trashBin, // Initialize trashBin
+    super.address,
   });
 
-  // Convert Business instance to a JSON Map
   @override
   Map<String, dynamic> toJson() {
     final json = super.toJson();
@@ -27,12 +26,11 @@ class Business extends Users {
       'businessName': businessName,
       'phoneNumber': phoneNumber,
       'businessType': businessType,
-      'trashBin' : trashBin
+      'trashBin': trashBin?.toJson(), // Safely serialize trashBin
     });
     return json;
   }
 
-  // Create a Business instance from a Map
   factory Business.fromJson(Map<String, dynamic> json) {
     return Business(
       businessName: json['businessName'] ?? '',
@@ -41,7 +39,10 @@ class Business extends Users {
       email: json['email'] ?? '',
       password: json['password'] ?? '',
       userId: json['userId'] ?? '',
-      trashBin: json['trashBin'] ?? '',
+      trashBin: json['trashBin'] != null
+          ? TrashBin.fromJson(json['trashBin']) // Create TrashBin from JSON
+          : null,
+      // Set to null if not present
       userRole: json['userRole'] ?? '',
     );
   }

@@ -1,38 +1,56 @@
-import 'package:greenroute_admin/api/api_client.dart';
-import 'package:greenroute_admin/services/location_service.dart';
+import '../api/api_client.dart';
 import '../models/location.dart';
 import '../models/trash_bin.dart';
+import 'location_service.dart';
 
 class TrashBinService {
-  final ApiClient _apiClient = ApiClient();
+  final apiClient = ApiClient();
   final LocationService _locationService = LocationService();
 
-  // Get next trash bin ID
   Future<String> assignTrashBinId() async {
-    // Fetch all trash bins from the Firebase database
-    final trashBinData = await _apiClient.get('users/trashBin.json');
+    final trashBinData = await apiClient.get('users/trashBin.json');
+    print("Fetched Trash Bin Data: $trashBinData"); // Debug print
 
     if (trashBinData != null) {
-      // Extract the list of trash bin IDs and find the highest one
       List<String> trashBinIds = [];
       trashBinData.forEach((key, value) {
-        trashBinIds.add(value['binId']);
+        trashBinIds.add(value['binId'].toString());
       });
 
-      // Sort the bin IDs in ascending order
+      print("Trash Bin IDs: $trashBinIds"); // Debug print
+
       trashBinIds.sort((a, b) => int.parse(a).compareTo(int.parse(b)));
-
-      // Find the next available binId by incrementing the highest one
-      String nextBinId = (int.parse(trashBinIds.last) + 1).toString();
-
-      return nextBinId;
+      final newId = (int.parse(trashBinIds.last) + 1).toString();
+      print("Assigned Trash Bin ID: $newId"); // Debug print
+      return newId;
     } else {
-      // If no bins exist, start with binId "1"
+      print("No Trash Bin Data found, assigning ID: 1"); // Debug print
       return '1';
     }
   }
 
-  // Method to create a new trash bin
+  Future<String> assignPublicTrashBinId() async {
+    final trashBinData = await apiClient.get('publicBins.json');
+    print("Fetched Public Trash Bin Data: $trashBinData"); // Debug print
+
+    if (trashBinData != null) {
+      List<String> trashBinIds = [];
+      trashBinData.forEach((key, value) {
+        trashBinIds.add(value['binId'].toString());
+      });
+
+      print("Public Trash Bin IDs: $trashBinIds"); // Debug print
+
+      trashBinIds.sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+      final newId = (int.parse(trashBinIds.last) + 1).toString();
+      print("Assigned Public Trash Bin ID: $newId"); // Debug print
+      return newId;
+    } else {
+      print("No Public Trash Bin Data found, assigning ID: 1"); // Debug print
+      return '1';
+    }
+  }
+
   Future<void> createTrashBin({
     required String userId,
     required double latitude,
@@ -41,60 +59,39 @@ class TrashBinService {
     required double trashLevel,
     required String sensorData,
   }) async {
-    try {
-      // Get the next available trash bin ID
-      String newBinId = await assignTrashBinId();
+    String newBinId = await assignTrashBinId();
+    print("Creating Trash Bin with ID: $newBinId"); // Debug print
 
-      // Create a new location for the trash bin
-      await _locationService.addNewLocation(
-        userId: userId,
-        latitude: latitude,
-        longitude: longitude,
-        name: name,
-        binId: newBinId,
-      );
+    await _locationService.addNewLocation(
+      userId: userId,
+      latitude: latitude,
+      longitude: longitude,
+      name: name,
+      binId: newBinId,
+    );
 
-      // Create a new TrashBin object
-      TrashBin newTrashBin = TrashBin(
-        binId: int.parse(newBinId),
-        location: Locations(
-          latitude: latitude,
-          longitude: longitude,
-          name: name,
-        ),
-        trashLevel: trashLevel,
-        sensorData: sensorData,
-      );
+    TrashBin newTrashBin = TrashBin(
+      binId: newBinId,
+      location: Locations(latitude: latitude, longitude: longitude, name: name),
+      trashLevel: trashLevel,
+      sensorData: sensorData,
+      type: 'business', // Assuming it's a business bin, can be adjusted
+    );
 
-      // Convert TrashBin object to JSON
-      Map<String, dynamic> trashBinData = newTrashBin.toJson();
+    Map<String, dynamic> trashBinData = newTrashBin.toJson();
+    print("Trash Bin Data to be saved: $trashBinData"); // Debug print
 
-      // 1. Query the user by userId to get the Firebase key
-      final userResponse = await _apiClient.get(
-        'users.json?orderBy="userId"&equalTo="$userId"',
-      );
-
-      // No need to decode userResponse.body since it is already decoded
-      final userData = userResponse as Map<String, dynamic>;
-
-      // Check if user exists
-      if (userData.isNotEmpty) {
-        // Extract the Firebase key (unique identifier for the user)
-        final firebaseUserKey = userData.keys.first;
-
-        // 2. Use the Firebase key to save the trashBin data for that user
-        await _apiClient.patch(
-          'users/$firebaseUserKey/trashBin.json',
-          trashBinData,
-        );
-
-        print('Trash bin created successfully');
-      } else {
-        throw Exception('User not found for userId: $userId');
-      }
-    } catch (e) {
-      print('Failed to create trash bin: $e');
-      throw Exception('Error creating trash bin');
+    final userResponse =
+        await apiClient.get('users.json?orderBy="userId"&equalTo="$userId"');
+    if (userResponse.isNotEmpty) {
+      final firebaseUserKey = userResponse.keys.first;
+      print("Firebase User Key: $firebaseUserKey"); // Debug print
+      await apiClient.patch(
+          'users/$firebaseUserKey/trashBin.json', trashBinData);
+      print("Successfully updated user's Trash Bin data."); // Debug print
+    } else {
+      print("User not found for userId: $userId"); // Debug print
+      throw Exception('User not found for userId: $userId');
     }
   }
 
@@ -103,41 +100,64 @@ class TrashBinService {
     required double longitude,
     required String name,
   }) async {
-    try {
-      // Get the next available trash bin ID
-      String newBinId = await assignTrashBinId();
-      double trashLevel = 0;
-      String sensorData = 'empty';
+    String newBinId = await assignPublicTrashBinId();
+    print("Creating Public Bin with ID: $newBinId"); // Debug print
 
-      // Create a new location for the trash bin
-      await _locationService.addNewPublicLocation(
-        latitude: latitude,
-        longitude: longitude,
-        name: name,
-      );
+    TrashBin newTrashBin = TrashBin(
+      binId: newBinId,
+      location: Locations(latitude: latitude, longitude: longitude, name: name),
+      trashLevel: 0,
+      sensorData: 'empty',
+      type: 'public',
+    );
 
-      // Create a new TrashBin object
-      TrashBin newTrashBin = TrashBin(
-        binId: int.parse(newBinId),
-        location: Locations(
-          latitude: latitude,
-          longitude: longitude,
-          name: name,
-        ),
-        trashLevel: trashLevel,
-        sensorData: sensorData,
-      );
+    Map<String, dynamic> trashBinData = newTrashBin.toJson();
+    print("Public Trash Bin Data to be saved: $trashBinData"); // Debug print
+    await apiClient.post('publicBins.json', trashBinData);
+    print("Successfully created Public Bin."); // Debug print
+  }
 
-      // Convert TrashBin object to JSON
-      Map<String, dynamic> trashBinData = newTrashBin.toJson();
+  Future<List<TrashBin>> getPublicBins() async {
+    final response = await apiClient.get('publicBins.json');
+    print("Fetched Public Bins: $response"); // Debug print
+    List<TrashBin> publicBins = [];
+    response.forEach((key, value) {
+      publicBins.add(TrashBin.fromJson(value));
+    });
+    print("Total Public Bins retrieved: ${publicBins.length}"); // Debug print
+    return publicBins;
+  }
 
-      // Logic to save trashBinData to your database
-      // await _apiClient.put('publicBins.json', trashBinData); // Example save
+  Future<List<TrashBin>> getBusinessBins() async {
+    // Fetch all users where role is "business"
+    final response = await apiClient.get('users.json');
+    print("Fetched All Users: $response"); // Debug print
 
-      print('Public trash bin created successfully');
-    } catch (e) {
-      print('Failed to create public trash bin: $e');
-      throw Exception('Error creating public trash bin');
+    List<TrashBin> businessBins = [];
+
+    // Iterate through the users and extract trashBin if available
+    response.forEach((key, value) {
+      if (value['role'] == 'business' && value['trashBin'] != null) {
+        businessBins.add(TrashBin.fromJson(value['trashBin']));
+      }
+    });
+
+
+    print("Total Business Bins retrieved: ${businessBins.length}"); // Debug print
+    return businessBins;
+  }
+
+
+  Future<TrashBin?> getPublicBinById(String binId) async {
+    final response = await apiClient.get('publicBins.json');
+    print("Fetched Data for Bin ID: $binId"); // Debug print
+    for (var value in response.values) {
+      if (value['binId'] == binId) {
+        print("Found Public Bin: $value"); // Debug print
+        return TrashBin.fromJson(value);
+      }
     }
+    print("No Public Bin found for ID: $binId"); // Debug print
+    return null;
   }
 }

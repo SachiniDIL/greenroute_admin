@@ -47,7 +47,7 @@ class _BusinessSignupScreenState extends State<BusinessSignUpScreen> {
       setState(() {
         _latitude = locationData['latitude'];
         _longitude = locationData['longitude'];
-        _locationName = locationData['locationName'];
+        _locationName = locationData['name'];
       });
     }
   }

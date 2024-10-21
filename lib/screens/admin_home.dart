@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'sidebar.dart';
+import '../widgets/sidebar.dart';
 
 class AdminHomePage extends StatelessWidget {
   const AdminHomePage({super.key});

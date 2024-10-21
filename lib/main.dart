@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:greenroute_admin/screens/login.dart';
+import 'package:greenroute_admin/screens/admin_home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,7 +36,8 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(builder: (context) => const AdminHomePage()),
+        //TODO change to the LoginScreen
       );
     });
   }

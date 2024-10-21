@@ -1,9 +1,12 @@
 // lib/services/payment_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../api/api_client.dart';
 import '../models/payment.dart';
 
 class PaymentService {
+  final apiClient = ApiClient();
+
   final String baseUrl = 'https://example.com/api'; // Replace with your API URL
 
   // Add a new payment

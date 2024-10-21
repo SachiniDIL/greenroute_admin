@@ -1,12 +1,13 @@
-import 'package:greenroute_admin/models/location.dart';
+import 'package:greenroute_admin/models/route.dart';
 
 class Schedule {
-  final int scheduleId;
+  final String scheduleId;
   final String truckNumber;
   final String driverName;
   final DateTime startTime;
   final DateTime endTime;
-  final List<Locations> routeLocations;
+  final Route route;
+  final DateTime date;
 
   Schedule({
     required this.scheduleId,
@@ -14,20 +15,20 @@ class Schedule {
     required this.driverName,
     required this.startTime,
     required this.endTime,
-    required this.routeLocations,
+    required this.route,
+    required this.date,
   });
 
   // Convert JSON data to a Schedule object
   factory Schedule.fromJson(Map<String, dynamic> json) {
-    List<Locations> locations = (json['routeLocations'] as List).map((location) => Locations.fromJson(location)).toList();
-
     return Schedule(
       scheduleId: json['scheduleId'],
       truckNumber: json['truckNumber'],
       driverName: json['driverName'],
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
-      routeLocations: locations,
+      route: Route.fromJson(json['route']),
+      date: DateTime.parse(json['date']), // Parse date from JSON
     );
   }
 
@@ -39,7 +40,8 @@ class Schedule {
       'driverName': driverName,
       'startTime': startTime.toIso8601String(),
       'endTime': endTime.toIso8601String(),
-      'routeLocations': routeLocations.map((location) => location.toJson()).toList(),
+      'route': route.toJson(),
+      'date': date.toIso8601String(), // Include date in JSON
     };
   }
 }

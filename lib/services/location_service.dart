@@ -3,7 +3,7 @@ import 'package:greenroute_admin/services/user_service.dart';
 import '../api/api_client.dart';
 
 class LocationService {
-  final ApiClient _apiClient = ApiClient();
+  final apiClient = ApiClient();
   final UserService _userService = UserService();
 
   // Method to add or update a new location for a specific user
@@ -29,7 +29,7 @@ class LocationService {
       }
 
       // Step 2: Update the location under the correct user and bin
-      await _apiClient.put(
+      await apiClient.put(
           'users/$userKey/trashBin/location.json', locationData);
       print(
           'Location added/updated successfully for user $userId (key: $userKey) and bin $binId');
@@ -52,7 +52,7 @@ class LocationService {
 
     try {
       // Assuming that 'publicLocations' is a valid path in your database
-      await _apiClient.post('publicLocations.json', locationData);
+      await apiClient.post('publicLocations.json', locationData);
       print('Public location added successfully: $locationData');
     } catch (e) {
       print('Failed to add public location: $e');
